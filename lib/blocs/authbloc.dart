@@ -113,6 +113,35 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthUnauthenticated());
     }
   }
+  Future<void> reauthenticate({required String email}) async {
+    try {
+      // Check if there is a user signed in
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        // If no user is currently signed in, emit AuthAuthenticated
+        emit(AuthAuthenticated());
+        return;
+      }
+
+      // Check if the entered email matches the signed-in user's email
+      if (currentUser.email == email) {
+        // Proceed with the reauthentication process
+        // You may need to implement the specific reauthentication logic based on your authentication provider
+        // Example: await currentUser.reauthenticateWithCredential(credential);
+
+        // After successful reauthentication, emit AuthAuthenticated
+        emit(AuthAuthenticated());
+      } else {
+        // Handle the case where the entered email does not match the signed-in user's email
+        emit(AuthError('Entered email does not match the signed-in user\'s email.'));
+      }
+    } catch (e) {
+      // Handle other errors during reauthentication
+      emit(AuthError(e.toString()));
+    }
+  }
+
+
 
   Future<void> signOut() async {
     await _auth.signOut();

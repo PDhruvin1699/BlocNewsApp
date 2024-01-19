@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -1105,18 +1106,20 @@ String sourceName = deepLink.queryParameters[' sourceName'] ?? '';
                 },
               ),
               IconButton(
-                icon: Icon(Icons.refresh),
+                icon: Icon(Icons.logout),
                 onPressed: () {
-                  BlocProvider.of<NewsBloc>(context).add(FetchNews());
-                  isSynced = false;
+                  // BlocProvider.of<NewsBloc>(context).add(FetchNews());
+                  // isSynced = false;
+                  FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacementNamed(context, '/signup');
                 },
               ),
             ],
             bottom: TabBar(
               tabs: [
                 Tab(text: 'Trending'),
-                Tab(text: 'For You'),
-                Tab(text: 'Liked'),
+                // Tab(text: 'For You'),
+                // Tab(text: 'Liked'),
                 PreferredSize(
                   preferredSize: Size.fromHeight(50.0),
                   child: Column(
@@ -1153,8 +1156,8 @@ String sourceName = deepLink.queryParameters[' sourceName'] ?? '';
                     ? TabBarView(
                   children: [
                     buildTabContent(context, state, 'Trending'),
-                    buildTabContent(context, state, 'For You'),
-                    buildTabContent(context, state, 'Liked'),
+                    // buildTabContent(context, state, 'For You'),
+                    // buildTabContent(context, state, 'Liked'),
                   ],
                 )
                     : state is NewsError

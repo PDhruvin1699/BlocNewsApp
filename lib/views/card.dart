@@ -311,13 +311,13 @@
 // }
 //
 //
-
 import 'dart:io';
-import 'dart:typed_data';
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -331,165 +331,6 @@ import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../model/article_model.dart';
-
-// class YourCardWidget extends StatelessWidget {
-//   final ArticleModel? article;
-//   final VoidCallback onMorePressed;
-//   final double textSize;
-//   final BuildContext context;
-//
-//   YourCardWidget({required this.article,
-//     required this.onMorePressed,
-//     required this.textSize,
-//     required this.context});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       elevation: 7,
-//       margin: EdgeInsets.all(7.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.stretch,
-//         children: [
-//           _buildPhotoViewGallery(context),
-//           Padding(
-//             padding: EdgeInsets.all(8.0),
-//             child: Text(
-//               article?.title ?? 'No title available',
-//               overflow: TextOverflow.ellipsis,
-//               style: TextStyle(
-//                 fontSize: textSize,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//           ),
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               TextButton(
-//                 onPressed: onMorePressed,
-//                 child: Row(
-//                   children: [
-//                     Text(
-//                       'More',
-//                       style: TextStyle(
-//                         fontSize: 16,
-//                         fontWeight: FontWeight.w500,
-//                       ),
-//                     ),
-//                     Icon(Icons.chevron_right),
-//                   ],
-//                 ),
-//               ),
-//               IconButton(
-//                 icon: Icon(Icons.save),
-//                 onPressed: () {
-//
-//                 },
-//               ),
-//               IconButton(
-//                 icon: Icon(Icons.share),
-//                 onPressed: () {},
-//               ),
-//
-//
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _buildPhotoViewGallery(BuildContext context) {
-//     return FutureBuilder<bool>(
-//       future: _isOnline(),
-//       builder: (context, snapshot) {
-//         final isOnline = snapshot.hasData && snapshot.data == true;
-//
-//         if (isOnline) {
-//           return Container(
-//             height: 200.0,
-//             child: PhotoViewGallery.builder(
-//               itemCount: 1,
-//               builder: (context, index) {
-//                 return PhotoViewGalleryPageOptions(
-//                   imageProvider: NetworkImage(article?.urlToImage ?? ''),
-//                   minScale: PhotoViewComputedScale.contained,
-//                   maxScale: PhotoViewComputedScale.covered * 2,
-//                 );
-//               },
-//               scrollPhysics: BouncingScrollPhysics(),
-//               backgroundDecoration: BoxDecoration(
-//                 color: Colors.white,
-//               ),
-//             ),
-//           );
-//         } else {
-//           return FutureBuilder<String>(
-//             future: _getOfflineImagePath(article?.urlToImage ?? ''),
-//             builder: (context, snapshot) {
-//               if (snapshot.connectionState == ConnectionState.done) {
-//                 final String offlineImagePath = snapshot.data ?? '';
-//                 return Container(
-//                   height: 200.0,
-//                   child: PhotoViewGallery.builder(
-//                     itemCount: 1,
-//                     builder: (context, index) {
-//                       return PhotoViewGalleryPageOptions(
-//                         imageProvider: FileImage(File(offlineImagePath)),
-//                         minScale: PhotoViewComputedScale.contained,
-//                         maxScale: PhotoViewComputedScale.covered * 2,
-//                       );
-//                     },
-//                     scrollPhysics: BouncingScrollPhysics(),
-//                     backgroundDecoration: BoxDecoration(
-//                       color: Colors.white,
-//                     ),
-//                   ),
-//                 );
-//               } else {
-//                 return _buildShimmerPlaceholder();
-//               }
-//             },
-//           );
-//         }
-//       },
-//     );
-//   }
-//
-//   Widget _buildShimmerPlaceholder() {
-//     return Shimmer.fromColors(
-//       baseColor: Colors.grey[300]!,
-//       highlightColor: Colors.grey[100]!,
-//       child: Container(
-//         height: 150.0,
-//         decoration: BoxDecoration(
-//           color: Colors.white,
-//           borderRadius: BorderRadius.only(
-//             topLeft: Radius.circular(8.0),
-//             topRight: Radius.circular(8.0),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Future<bool> _isOnline() async {
-//     var connectivityResult = await Connectivity().checkConnectivity();
-//     return connectivityResult != ConnectivityResult.none;
-//   }
-//
-//   Future<String> _getOfflineImagePath(String onlineImagePath) async {
-//     final Directory appDocDir = await getApplicationDocumentsDirectory();
-//     final String fileName = onlineImagePath
-//         .split('/')
-//         .last;
-//     return '${appDocDir.path}/images/$fileName';
-//   }
-//
-// }
-//
-
 
 // ...
 
@@ -641,13 +482,14 @@ class YourCardWidget extends StatelessWidget {
 
   void saveArticleToFirestore(ArticleModel? article) async {
     try {
-      CollectionReference firestore = await FirebaseFirestore.instance.collection("savedArticles");
+      CollectionReference firestore = await FirebaseFirestore.instance
+          .collection("savedArticles");
       await firestore.add({
         'title': article?.title,
         'description': article?.description,
         'url': article?.url,
         // Add other fields as needed
-      }).then((value){
+      }).then((value) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Article saved successfully!'),
@@ -662,8 +504,6 @@ class YourCardWidget extends StatelessWidget {
           ),
         );
       });
-
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -673,6 +513,7 @@ class YourCardWidget extends StatelessWidget {
       );
     }
   }
+
   Future<bool> _isOnline() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     return connectivityResult != ConnectivityResult.none;
@@ -681,87 +522,101 @@ class YourCardWidget extends StatelessWidget {
   Future<String> _getOfflineImagePath(String onlineImagePath) async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
     final String fileName =
-        onlineImagePath.split('/').last;
+        onlineImagePath
+            .split('/')
+            .last;
     return '${appDocDir.path}/images/$fileName';
   }
 
 
+Future<void> shareDynamicLink(ArticleModel? article) async {
+  if (article == null || article.id == null) {
+    // Handle the case where the article or its id is null
+    return;
+  }
+  debugPrint("Article Id: ${article.id}");
 
+  // Build the dynamic link with additional parameters directly in the Uri
+  final Uri dynamicLink = Uri.parse(
+    'https://newsdemo.page.link/article?articleId=${article.id}'
+        '&title=${Uri.encodeComponent(article.title)}'
+        '&author=${Uri.encodeComponent(article.author)}'
+        '&description=${Uri.encodeComponent(article.description)}'
+        '&url=${Uri.encodeComponent(article.url)}'
+        '&urlToImage=${Uri.encodeComponent(article.urlToImage)}'
+        '&publishedAt=${Uri.encodeComponent(article.publishedAt)}'
+        '&content=${Uri.encodeComponent(article.content)}',
 
+  );
+
+  final DynamicLinkParameters parameters = DynamicLinkParameters(
+    uriPrefix: 'https://newsdemo.page.link',
+    link: dynamicLink,
+    androidParameters: AndroidParameters(
+      packageName: 'com.example.newsapp',
+    ),
+  );
+
+  final ShortDynamicLink shortLink =
+  await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+
+  final Uri shortUrl = shortLink.shortUrl;
+
+  debugPrint("Short Link: $shortUrl");
+
+  final sharedText =
+      '${article.title}\n\n${article.content}\n\nCheck out this article: $shortUrl';
+
+  Share.share(sharedText);
+}
 
   // Future<void> shareDynamicLink(ArticleModel? article) async {
-  //   if (article == null) {
-  //     // Handle the case where the article is null
+  //   if (article == null || article.id == null) {
+  //     // Handle the case where the article or its id is null
   //     return;
   //   }
-  //   debugPrint("Artical Id: ${article.id}");
+  //   debugPrint("Article Id: ${article.id}");
   //
-  //   final DynamicLinkParameters parameters = DynamicLinkParameters(
-  //     uriPrefix: 'https://dv16.page.link',
-  //     link: Uri.parse('https://news.com/article?articleId=${article.id}'),
-  //     androidParameters: AndroidParameters(
-  //       packageName: 'com.example.newsapp',
-  //     ),
-  //
-  //     // Add other parameters as needed
+  //   // Build the dynamic link with additional parameters directly in the Uri
+  //   final Uri dynamicLink = Uri.parse(
+  //     'https://dv16.page.link/article?articleId=${article.id}'
+  //         '&title=${Uri.encodeComponent(article.title)}'
+  //         '&author=${Uri.encodeComponent(article.author)}'
+  //         '&description=${Uri.encodeComponent(article.description)}'
+  //         '&url=${Uri.encodeComponent(article.url)}'
+  //         '&urlToImage=${Uri.encodeComponent(article.urlToImage)}'
+  //         '&publishedAt=${Uri.encodeComponent(article.publishedAt)}'
+  //         '&content=${Uri.encodeComponent(article.content)}',
   //   );
   //
+  //   if (kIsWeb) {
+  //     // For web, directly launch the URL
+  //     if (await canLaunch(dynamicLink.toString())) {
+  //       html.window.open(dynamicLink.toString(), '_blank');
+  //     } else {
+  //       throw 'Could not launch $dynamicLink';
+  //     }
+  //   } else {
+  //     // For other platforms (iOS and Android), use the Share package
+  //     final DynamicLinkParameters parameters = DynamicLinkParameters(
+  //       uriPrefix: 'https://dv16.page.link',
+  //       link: dynamicLink,
+  //       androidParameters: AndroidParameters(
+  //         packageName: 'com.example.newsapp',
+  //       ),
+  //     );
   //
+  //     final ShortDynamicLink shortLink =
+  //     await FirebaseDynamicLinks.instance.buildShortLink(parameters);
   //
+  //     final Uri shortUrl = shortLink.shortUrl;
   //
-  //   final ShortDynamicLink shortLink =
-  //   await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+  //     debugPrint("Short Link: $shortUrl");
   //
-  //   final Uri dynamicUrl = shortLink.shortUrl;
+  //     final sharedText =
+  //         '${article.title}\n\n${article.content}\n\nCheck out this article: $shortUrl';
   //
-  //   debugPrint("Link $dynamicUrl");
-  //
-  //   final sharedText =
-  //       '${article.title}\n\n${article.content}\n\nCheck out this article: $dynamicUrl';
-  //
-  //   Share.share(sharedText);
+  //     Share.share(sharedText);
+  //   }
   // }
-
-  Future<void> shareDynamicLink(ArticleModel? article) async {
-    if (article == null || article.id == null) {
-      // Handle the case where the article or its id is null
-      return;
-    }
-    debugPrint("Article Id: ${article.id}");
-
-    // Build the dynamic link with additional parameters directly in the Uri
-    final Uri dynamicLink = Uri.parse(
-      'https://dv16.page.link/article?articleId=${article.id}'
-          '&title=${Uri.encodeComponent(article.title)}'
-          '&author=${Uri.encodeComponent(article.author)}'
-          '&description=${Uri.encodeComponent(article.description)}'
-          '&url=${Uri.encodeComponent(article.url)}'
-          '&urlToImage=${Uri.encodeComponent(article.urlToImage)}'
-          '&publishedAt=${Uri.encodeComponent(article.publishedAt)}'
-          '&content=${Uri.encodeComponent(article.content)}',
-
-    );
-
-    final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'https://dv16.page.link',
-      link: dynamicLink,
-      androidParameters: AndroidParameters(
-        packageName: 'com.example.newsapp',
-      ),
-    );
-
-    final ShortDynamicLink shortLink =
-    await FirebaseDynamicLinks.instance.buildShortLink(parameters);
-
-    final Uri shortUrl = shortLink.shortUrl;
-
-    debugPrint("Short Link: $shortUrl");
-
-    final sharedText =
-        '${article.title}\n\n${article.content}\n\nCheck out this article: $shortUrl';
-
-    Share.share(sharedText);
-  }
-
-
 }
